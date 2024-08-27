@@ -1,0 +1,32 @@
+apiVersion: skaffold/v4beta3
+kind: Config
+metadata:
+  name: shell
+requires:
+  - path: ../build/
+build:
+  tagPolicy:
+    sha256: {}
+  local:
+    useBuildkit: true
+  artifacts:
+    - image: ghcr.io/promise-labs/sdf-cli
+      context: ./container
+      docker:
+        dockerfile: ./container/Dockerfile
+      requires:
+        - image: ghcr.io/promise-labs/sdf-base-debian
+          alias: DEBIAN_IMAGE
+        - image: ghcr.io/promise-labs/sdf-build-outputs
+          alias: BUILD_OUTPUTS
+    - image: ghcr.io/promise-labs/sdf-example-imdb
+      context: ./examples/
+      docker:
+        dockerfile: ./examples/Dockerfile
+      requires:
+        - image: ghcr.io/promise-labs/sdf-base-debian
+          alias: DEBIAN_IMAGE
+        - image: ghcr.io/promise-labs/sdf-build-outputs
+          alias: BUILD_OUTPUTS
+        - image: ghcr.io/promise-labs/sdf-cli
+          alias: SHELL_IMAGE
